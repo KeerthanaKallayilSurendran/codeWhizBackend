@@ -14,12 +14,12 @@ exports.registerController = async(req, res) => {
             res.status(406).json("You are already registerd Please Login")
         }else{
             const hashPassword = await bcrypt.hash(password, 10)
-            console.log(hashPassword);
+            // console.log(hashPassword);
             
             const newUser = new users({
                 username, userType, email, password:hashPassword
             })
-            console.log(newUser);
+            // console.log(newUser);
             newUser.save()
             res.status(200).json(newUser)
         }
@@ -30,29 +30,36 @@ exports.registerController = async(req, res) => {
 
 
 // login controller
-exports.loginController = async(req, res) =>{
+exports.loginController = async (req, res) => {
     console.log("inside Login Controller");
-    console.log(req.body);
-    const {email, password} = req.body
+    const { email, password } = req.body;
     try {
-        console.log(36);
-        const existingUser = await users.findOne({email})
+        const existingUser = await users.findOne({ email });
+        console.log({email});
         console.log(existingUser);
-        if(existingUser){
-            const isMatch = bcrypt.compare(password, existingUser.password)
-            if(isMatch){
-                const token = jwt.sign({userId:existingUser._id}, process.env.JWTPASSWORD)
-                res.status(200).json({user:existingUser, token})
-            }else{
-                res.status(404).json("Incorrect Password")
+        
+        if (existingUser) {
+            const isMatch = await bcrypt.compare(password, existingUser.password);
+            console.log(isMatch);
+            
+            if (isMatch) {
+                const token = jwt.sign(
+                    { userId: existingUser._id  },
+                    process.env.JWTPASSWORD,
+                    { expiresIn: '1h' }
+                  );
+                res.status(200).json({ user: existingUser, token });
+            } else {
+                res.status(404).json("Incorrect Password");
             }
-        }else{
-            res.status(406).json("You are not registered")
+        } else {
+            res.status(406).json("You are not registered");
         }
     } catch (err) {
         res.status(401).json(err);
     }
-}
+};
+
 
 // forgotPasswordController
 
@@ -70,7 +77,7 @@ exports.forgotPasswordController = async (req, res) => {
         }
 
         // Generate a JWT token for password reset
-        const resetToken = jwt.sign({ id: existingUser._id }, process.env.JWTPASSWORD, { expiresIn: '1h' });
+        const resetToken = jwt.sign({ userId: existingUser._id }, process.env.JWTPASSWORD, { expiresIn: '1h' });
 
         // Create transport for nodemailer
         const transporter = nodemailer.createTransport({
