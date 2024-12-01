@@ -43,11 +43,9 @@ exports.loginController = async (req, res) => {
             console.log(isMatch);
             
             if (isMatch) {
-                const token = jwt.sign(
-                    { userId: existingUser._id  },
-                    process.env.JWTPASSWORD,
-                    { expiresIn: '1h' }
-                  );
+                const token=jwt.sign({userId:existingUser._id},process.env.JWTPASSWORD)
+                console.log(token);
+                
                 res.status(200).json({ user: existingUser, token });
             } else {
                 res.status(404).json("Incorrect Password");
@@ -77,7 +75,7 @@ exports.forgotPasswordController = async (req, res) => {
         }
 
         // Generate a JWT token for password reset
-        const resetToken = jwt.sign({ userId: existingUser._id }, process.env.JWTPASSWORD, { expiresIn: '1h' });
+        const resetToken = jwt.sign({userId:existingUser._id},process.env.JWTPASSWORD)
 
         // Create transport for nodemailer
         const transporter = nodemailer.createTransport({

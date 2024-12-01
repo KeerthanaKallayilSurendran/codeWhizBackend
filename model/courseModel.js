@@ -10,7 +10,8 @@ const courseSchema = new mongoose.Schema({
         require:true
     },
     category:{
-        type:String,
+        type:mongoose.Schema.Types.String,
+        ref:'categories',
         require:true
     },
     price:{
@@ -26,6 +27,10 @@ const courseSchema = new mongoose.Schema({
         require:true
     },
     userId:{
+        type:String,
+        require:true
+    },
+    categoryId:{
         type:String,
         require:true
     }
