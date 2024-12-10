@@ -147,3 +147,18 @@ exports.resetPasswordController = async (req, res) => {
     }
 };
 
+exports.getAllStudentsController = async(req,res)=>{
+    console.log("Inside get all students controller");
+    try {
+        const allStudents = await users.find({ userType: 'Student' });
+        if(allStudents.length>0){
+            res.status(200).json(allStudents)
+        }else{
+            res.status(404).json("No Students joined")
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(404).json(error)
+        
+    }
+}

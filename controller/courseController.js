@@ -1,6 +1,6 @@
 const categories = require('../model/categoryModel');
 const courses = require('../model/courseModel')
-
+const VideoClasses = require('../model/videoClassModel')
 
 
 // add Categories
@@ -14,9 +14,9 @@ exports.addCategoryController = async(req,res) =>{
         if(existingCategory){
             res.status(406).json("Already Existing Category");
         }else{
-            const newCategory = new categories({categoryName})
-            await newCategory.save()
-            res.status(200).json(newCategory)
+            const newVideoClasses = new categories({categoryName})
+            await newVideoClasses.save()
+            res.status(200).json(newVideoClasses)
         }
     } catch (error) {
         res.status(401).json(error);
@@ -124,4 +124,65 @@ exports.deleteCourseController = async(req,res)=>{
     {
         res.status(401).json(err)
     }
+}
+
+exports.addCourseVideoClassController = async(req,res)=>{
+    const {id} = req.params
+    console.log("Inside Add Course Video Class Controller");
+    const {classTitle, thumbnailUrl, videoLink} = req.body
+    
+    try {
+        const newVideoClasses = new VideoClasses({classTitle, thumbnailUrl, videoLink, courseId:id })
+        await newVideoClasses.save()
+        res.status(200).json(newVideoClasses)
+    } catch (error) {
+        res.status(401).json(error);
+    }
+}
+
+
+exports.viewUserClassController = async(req,res)=>{
+    console.log("Inside view user  class controller");
+    const userId = req.userId
+    const courseId = req.params.id
+    // console.log(category);
+    console.log(courseId);
+    
+    
+    try {
+        const allVideos = await VideoClasses.find({courseId})
+        console.log(allVideos);
+        
+        res.status(200).json(allVideos)
+    } catch (error) {
+        res.status(401).json(error)
+    }
+    
+}
+
+exports.deleteClassController = async(req,res)=>{
+    console.log("Inside delete class Controller");
+    const {id}=req.params
+    try
+    {
+        const deleteCourse = await VideoClasses.findByIdAndDelete({_id:id})
+        res.status(200).json(deleteCourse)
+    }
+    catch(err)
+    {
+        res.status(401).json(err)
+    }
+}
+
+
+
+exports.viewHomeCourseController = async(req,res)=>{
+    console.log("Inside view user project controller");
+    try {
+        const allCourses = await courses.find()
+        res.status(200).json(allCourses)
+    } catch (error) {
+        res.status(401).json(error)
+    }
+    
 }
